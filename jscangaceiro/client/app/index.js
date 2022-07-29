@@ -1,39 +1,41 @@
-var campos = [
-    document.querySelector('#data'),
-    document.querySelector('#valor'),
-    document.querySelector('#quantidade'),
-];
+System.register([], function (_export, _context) {
+    "use strict";
 
-console.log(campos);
+    var campos, tbody;
+    return {
+        setters: [],
+        execute: function () {
+            campos = [document.querySelector('#data'), document.querySelector('#valor'), document.querySelector('#quantidade')];
 
-var tbody = document.querySelector('table tbody');
 
-document.querySelector('.form').addEventListener('submit', function(event) {
+            console.log(campos);
 
-    event.preventDefault();
-    var tr = document.createElement('tr');
+            tbody = document.querySelector('table tbody');
 
-    campos.forEach(function(campo) {
-        var td= document.createElement('td');
 
-        td.textContent = campo.value;
-        tr.appendChild(td);
-    });
+            document.querySelector('.form').addEventListener('submit', function (event) {
 
-    var tdVolume = document.createElement('td');    
-    tdVolume.textContent = campos[1].value * campos[2].value;
-    tr.appendChild(tdVolume);
-    
-    tbody.appendChild(tr);
+                event.preventDefault();
+                var tr = document.createElement('tr');
 
-    //limpa os campos após o submit
-    campos[0].value = '';
-    campos[1].value = '';
-    campos[2].value = 0;
+                campos.forEach(function (campo) {
+                    var td = document.createElement('td');
+                    td.textContent = campo.value;
+                    tr.appendChild(td);
+                });
 
-    //foca no campo da data
-    campos[0].focus();
-    
+                var tdVolume = document.createElement('td');
+                tdVolume.textContent = campos[1].value * campos[2].value;
+                tr.appendChild(tdVolume);
+
+                tbody.appendChild(tr);
+
+                campos[0].value = '';
+                campos[1].value = 1;
+                campos[2].value = 0;
+                campos[0].focus();
+            });
+        }
+    };
 });
-
-
+//# sourceMappingURL=index.js.map
