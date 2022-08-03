@@ -1,16 +1,14 @@
 import { Negociacoes, NegociacaoService, Negociacao } from '../domain/index.js';
 import { NegociacoesView, MensagemView, Mensagem, DateConverter } from '../ui/index.js';
-import { getNegociacaoDao, Bind, getExceptionMessage } from '../util/index.js';
+import { getNegociacaoDao, Bind, getExceptionMessage, debounce, controller, bindEvent } from '../util/index.js';
 
+@controller('#data', '#quantidade', '#valor')
 export class NegociacaoController {
 
-    constructor() {
+    constructor(_inputData, _inputQuantidade, _inputValor) {
 
-        const $ = document.querySelector.bind(document);
-        this._inputData = $('#data');
-        this._inputQuantidade = $('#quantidade');
-        this._inputValor = $('#valor');
-
+        Object.assign(this, { _inputData, _inputQuantidade, _inputValor })
+        
         this._negociacoes = new Bind(
             new Negociacoes(),
             new NegociacoesView('#negociacoes'),
@@ -35,23 +33,23 @@ export class NegociacaoController {
             const negociacoes = await dao.listaTodos();
             negociacoes.forEach(negociacao => this._negociacoes.adiciona(negociacao));
         } catch (err) {
-            this._mensagem.texto  = getExceptionMessage(err);
+            this._mensagem.texto = getExceptionMessage(err);
         }
     }
 
+    @bindEvent('submit', '.form')
+    @debounce()
     async adiciona(event) {
 
         try {
-            event.preventDefault();
             const negociacao = this._criaNegociacao();
             const dao = await getNegociacaoDao();
             await dao.adiciona(negociacao);
             this._negociacoes.adiciona(negociacao);
             this._mensagem.texto = 'Negociação adicionada com sucesso';
             this._limpaFormulario();
-
         } catch (err) {
-            this._mensagem.texto  = getExceptionMessage(err);
+            this._mensagem.texto = getExceptionMessage(err);
         }
     }
 
@@ -72,6 +70,8 @@ export class NegociacaoController {
         );
     }
 
+    @bindEvent('click', '#botao-importa')
+    @debounce()
     async importaNegociacoes() {
 
         try {
@@ -81,14 +81,15 @@ export class NegociacaoController {
 
                 !this._negociacoes.paraArray().some(negociacaoExistente =>
                     novaNegociacao.equals(negociacaoExistente)))
-
                 .forEach(negociacao => this._negociacoes.adiciona(negociacao));
+
             this._mensagem.texto = 'Negociações do período importadas com sucesso';
         } catch (err) {
-            this._mensagem.texto  = getExceptionMessage(err);
+            this._mensagem.texto = getExceptionMessage(err);
         }
     }
 
+    @bindEvent('click', '#botao-apaga')
     async apaga() {
 
         try {
@@ -97,8 +98,7 @@ export class NegociacaoController {
             this._negociacoes.esvazia();
             this._mensagem.texto = 'Negociações apagadas com sucesso';
         } catch (err) {
-            this._mensagem.texto  = getExceptionMessage(err);
+            this._mensagem.texto = getExceptionMessage(err);
         }
     }
-
 }
